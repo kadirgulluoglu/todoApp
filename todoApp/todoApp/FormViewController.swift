@@ -14,7 +14,7 @@ class FormViewController: UIViewController ,UIImagePickerControllerDelegate, UIN
     @IBOutlet weak var priceTextField: UITextField!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var imageView: UIImageView!
-    
+    @IBOutlet weak var button: UIButton!
     
     var selectedName = ""
     var selectedId : UUID?
@@ -22,11 +22,47 @@ class FormViewController: UIViewController ,UIImagePickerControllerDelegate, UIN
     override func viewDidLoad() {
         
         if(selectedName != ""){
-            if (selectedId?.uuidString) != nil{
+            button.isHidden = true
+            if let uuid = selectedId?.uuidString{
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let context = appDelegate.persistentContainer.viewContext
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Todo")
+                fetchRequest.predicate = NSPredicate(format: "id = %@", uuid)
+                fetchRequest.returnsObjectsAsFaults = false
+                
+                
+                do{
+                    let result = try context.fetch(fetchRequest)
+                    
+                    if result.count > 0 {
+                        for r in result as! [NSManagedObject] {
+                            if let name = r.value(forKey: "name") as? String {
+                                nameTextField.text = name
+                            }
+                            if let price = r.value(forKey: "price") as? Int {
+                                priceTextField.text = String(price)
+                            }
+                            if let size = r.value(forKey: "size") as? String {
+                                sizeTextField.text = String(size)
+                            }
+                            if let imageData = r.value(forKey: "image") as? Data {
+                              let image = UIImage(data: imageData)
+                                imageView.image = image
+                            }
+                        }
+                    }
+                    
+                    
+                }
+                catch{
+                    print("hata var")
+                }
                 
             }
         }
         else {
+            button.isHidden = false
+            button.isEnabled = false
             sizeTextField.text = ""
             priceTextField.text = ""
             nameTextField.text = ""
@@ -55,7 +91,7 @@ class FormViewController: UIViewController ,UIImagePickerControllerDelegate, UIN
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         imageView.image = info[.originalImage] as? UIImage
         self.dismiss(animated: true,completion: nil)
-        
+        button.isEnabled = true
         
         
     }
