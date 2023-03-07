@@ -110,6 +110,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="PBC-52-Ocs"/>
                     <connections>
+                        <outlet property="button" destination="Erf-Pe-cYy" id="F3L-c1-TJJ"/>
                         <outlet property="imageView" destination="fCW-DH-tlB" id="JpD-jI-fQg"/>
                         <outlet property="nameTextField" destination="xW0-YW-ZCb" id="P21-wM-Ol3"/>
                         <outlet property="priceTextField" destination="069-ps-AFa" id="VuR-Ss-DcF"/>
