@@ -43,16 +43,19 @@ class ViewController: UIViewController ,UITableViewDelegate, UITableViewDataSour
         
         do{
             let result = try context.fetch(fetchRequest)
-         
-            for r in result as! [NSManagedObject] {
-                if let name = r.value(forKey: "name") as? String{
-                    nameArray.append(name)
+            if result.count > 0{
+                for r in result as! [NSManagedObject] {
+                    if let name = r.value(forKey: "name") as? String{
+                        nameArray.append(name)
+                    }
+                    if let id = r.value(forKey: "id") as? UUID{
+                    idArray.append(id)
+                    }
                 }
-                if let id = r.value(forKey: "id") as? UUID{
-                idArray.append(id)
-                }
+                tableView.reloadData()
             }
-            tableView.reloadData()
+          
+           
         }
         catch{
             print("hata var")
@@ -88,5 +91,46 @@ class ViewController: UIViewController ,UITableViewDelegate, UITableViewDataSour
         selectedName = nameArray[indexPath.row]
         selectedId = idArray[indexPath.row]
         performSegue(withIdentifier: "toDetailsVc", sender: nil)
+    }
+    func tableView(_ tableView: UITableView,commit editingStyle: UITableViewCell.EditingStyle,forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete{
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+            
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Todo")
+            
+            let uuidString = idArray[indexPath.row].uuidString
+            fetchRequest.predicate = NSPredicate(format: "id = %@", uuidString)
+            
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            do{
+                let result = try context.fetch(fetchRequest)
+                if result.count > 0 {
+                    for r in result as! [NSManagedObject]{
+                        if let id = r.value(forKey: "id") as? UUID{
+                            if id == idArray[indexPath.row]{
+                                context.delete(r)
+                                nameArray.remove(at: indexPath.row)
+                                idArray.remove(at: indexPath.row)
+                                
+                                self.tableView.reloadData()
+                                
+                                do {
+                                    try context.save()
+                                } catch {
+                                    print("kaydetmede hata var")
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            catch {
+                print("Hata var")
+            }
+
+        }
     }
 }
