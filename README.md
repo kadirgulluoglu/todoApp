@@ -1,4 +1,4 @@
 # todoApp
 ## basic todo app for swift
 
-I learned to cache and delete data
+I learned from to cache create and delete data
