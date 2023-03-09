@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  todoApp
 //
-//  Created by AyzaSoft on 6.03.2023.
+//  Created by Kadir GÜLLÜOĞLU on 6.03.2023.
 //
 
 import UIKit
